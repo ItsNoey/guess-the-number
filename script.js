@@ -1,90 +1,76 @@
 'use strict';
 
-//Grab the body to change the background color
-let body = document.querySelector('body');
+const displayMessage = message =>
+  (document.querySelector('.message').textContent = message);
 
-//Grab the 'check' button
-const getGuess = document.querySelector('.check');
+const displayScore = score =>
+  (document.querySelector('.score').textContent = score);
 
-//Function: Compare the numbers and get the value of the 'guess' after the button is clicked
-getGuess.addEventListener('click', function () {
-  //Grab the value from the guess input
-  //'myGuess presents no value (0) when it is in the global scope.
-  const myGuess = Number(document.querySelector('.guess').value);
-  checkNums(myGuess, myNum);
-});
+const displayNum = num => (document.querySelector('.number').textContent = num);
 
-//Grab the message to change it accordingly (REFACTORED)
-const showMessage = function (message) {
-  document.querySelector('.message').textContent = message;
-};
+//Grab value from the input when the 'check' button is clicked
+const checkGuess = document
+  .querySelector('.check')
+  .addEventListener('click', function () {
+    const myGuess = Number(document.querySelector('.guess').value);
+    checkNums(myGuess, secretNum);
+  });
 
-//Get random a random number from 1 - 20
-let myNum = Math.trunc(Math.random() * 20) + 1;
-console.log(myNum);
+//Get a random number
+let secretNum = Math.trunc(Math.random() * 20) + 1;
 
-//Grab the box that will reveal the number
-let revealBox = document.querySelector('.number');
-
-//Get the 'score' element to count the score (REFACTORED)
-const tellScore = function (score) {
-  document.querySelector('.score').textContent = score;
-};
+//Reset the input value
+const resetInput = () => (document.querySelector('.guess').value = '');
 
 let score = 20;
-let highScore = 0;
+let highscore = 0;
 
 //Logic for the game
-const checkNums = function (guess, secretNum) {
-  //Check to see if there is any input
-  if (!guess) {
-    //Display result
-    showMessage('🤡 No number!');
-    //Condition for winning
-  } else if (guess === secretNum) {
-    showMessage('🥳 Correct!');
-    //Change background color
-    body.style.backgroundColor = '#f8ad9d';
-    //Shoe the secret number
-    revealBox.textContent = myNum;
-    //Expand the width of the box
-    revealBox.style.width = '20rem';
-
-    //Keep the winning high score. Change the value of the 'Highscore' to the current highest score, if applicable
-    if (score > highScore) {
-      highScore = score;
-      document.querySelector('.highscore').textContent = highScore;
+const checkNums = (checkGuess, secretNum) => {
+  //1. Check if there is any guess
+  if (!checkGuess) {
+    displayMessage('⛔️ No number ⛔️');
+    //2. Condition for when the guess is correct
+  } else if (checkGuess === secretNum) {
+    displayMessage('🎊 Correct guess!!! 🎊');
+    displayNum(secretNum);
+    document.querySelector('.number').style.width = '20rem';
+    document.querySelector('body').style.backgroundColor = '#55a630';
+    //2.1 If the guess is correct, keep the score and remain the highest score
+    if (score > highscore) {
+      document.querySelector('.highscore').textContent = score;
     }
-    //Condition for when the player guesses wrong
-  } else if (guess !== secretNum) {
-    //Only run these if the 'score' is still higher than zero
+    //3. Condition for when the guess is wrong and either too high or too low
+  } else if (checkGuess !== secretNum) {
+    //3.1 If the player guesses wrong, the score to keep decreasing by one each time
+    //3.2 The score is only to keep counting when it is above 1 because if the score is only above 0, the player can still play one more time
     if (score > 1) {
-      //If the player'guess is too how, the 'message' will hint according and vice versa
-      showMessage(guess > secretNum ? '🔺 Too high!' : '🔻 Too low!');
-      //The score decreases when the player guesses wrong
+      displayMessage(
+        checkGuess > secretNum ? '🔺 Too high 🔺' : '🔻 Too low 🔻'
+      );
+      //3.1 If the player guesses wrong, the score to keep decreasing by one each time
       score--;
-      //Update the score as the guess continues to be wrong but the score is still above 0
-      tellScore(score);
-      //When the score the is below 0 runs the code below
+      displayScore(score);
+      //3.3 Game is finished and player is lost after the score is at 0
     } else {
-      showMessage('🫣 You lost the game!');
-      //score--;
-      tellScore(0);
+      displayMessage('🫣 You lost! Restart the game! 🫣');
+      displayScore(0);
+      resetInput();
     }
   }
 };
 
-//Reset the game
-const resetButton = document
-  .querySelector('.again')
-  .addEventListener('click', function () {
-    myNum = Math.trunc(Math.random() * 20) + 1;
+//Function: Reset the game
+const resetGame = function () {
+  document.querySelector('.again').addEventListener('click', function () {
+    secretNum = Math.trunc(Math.random() * 20) + 1;
     score = 20;
-    tellScore(score);
-    document.querySelector('.guess').value = '';
-    showMessage('Start guessing...');
-    body.style.backgroundColor = '#222';
-
-    revealBox.textContent = '?';
-    revealBox.style.width = '15rem';
+    displayScore(score);
+    displayNum('?');
+    displayMessage('Start guessing...');
+    resetInput();
+    document.querySelector('body').style.backgroundColor = '#222';
+    document.querySelector('.number').style.width = '15rem';
   });
+};
+resetGame();
