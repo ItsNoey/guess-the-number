@@ -38,6 +38,7 @@ const checkNums = (checkGuess, secretNum) => {
     document.querySelector('body').style.backgroundColor = '#55a630';
     //2.1 If the guess is correct, keep the score and remain the highest score
     if (score > highscore) {
+      highscore = score;
       document.querySelector('.highscore').textContent = score;
     }
     //3. Condition for when the guess is wrong and either too high or too low
